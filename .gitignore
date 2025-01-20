@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and build outputs
+coverage
+.nyc_output
+dist
+
+# Dependency directories
+node_modules/
+.npm
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+
+# Cache and build artifacts
+.cache
+.parcel-cache
+.eslintcache
+*.tsbuildinfo
+
+# Optional yarn files
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
