@@ -3,93 +3,160 @@
 <head>
     <title>Calendar Events</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .gradient-bg {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+        }
+        .table-container {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .table-container:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .hover-transform:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6">Your Calendar Events</h1>
-        
-        <div class="mb-4">
-            <input type="date" id="dateFilter" class="border p-2 rounded">
-            <button onclick="filterEvents()" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Filter</button>
+<body class="min-h-screen gradient-bg">
+    <div class="p-6 max-w-4xl mx-auto">
+        <!-- Welcome Section -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Your Calendar</h1>
+            <button onclick="logout()" 
+                class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+            </button>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="min-w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                    </tr>
-                </thead>
-                <tbody id="eventsTable" class="bg-white divide-y divide-gray-200"></tbody>
-            </table>
+        <!-- Rest of your existing table and filter code -->
+        <!-- Filter Section -->
+        <div class="glass-effect p-4 rounded-lg mb-6 hover-transform">
+            <div class="flex items-center gap-3">
+                <input type="date" id="dateFilter" 
+                    class="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button onclick="filterEvents()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                    Filter
+                </button>
+                <button onclick="clearFilter()" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="glass-effect rounded-lg table-container">
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-black px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTable" class="bg-white divide-y divide-gray-100">
+                        <!-- Events will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+            <div class="flex justify-center items-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
         </div>
     </div>
 
     <script>
-    async function loadEvents(filterDate = '') {
-        try {
-            const url = filterDate 
-                ? `/api/events?date=${filterDate}`
-                : '/api/events';
-            
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Failed to fetch events');
+        async function loadEvents(filterDate = '') {
+            showLoading(true);
+            try {
+                const url = filterDate 
+                    ? `/api/events?date=${filterDate}`
+                    : '/api/events';
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const events = await response.json();
+                displayEvents(events);
+            } catch (error) {
+                console.error('Error loading events:', error);
+                document.getElementById('eventsTable').innerHTML = 
+                    '<tr><td colspan="4" class="px-4 py-3 text-center text-red-500 text-sm">Error loading events</td></tr>';
+            } finally {
+                showLoading(false);
             }
-            const events = await response.json();
-            displayEvents(events);
-        } catch (error) {
-            console.error('Error loading events:', error);
-            document.getElementById('eventsTable').innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Error loading events</td></tr>';
-        }
-    }
-
-    function displayEvents(events) {
-        const tableBody = document.getElementById('eventsTable');
-        tableBody.innerHTML = '';
-
-        if (events.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center">No events found for this date</td></tr>';
-            return;
         }
 
-        events.forEach(event => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap">${event.name}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${new Date(event.date).toLocaleDateString()}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${event.time}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${event.location}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    }
+        function displayEvents(events) {
+            const tableBody = document.getElementById('eventsTable');
+            tableBody.innerHTML = '';
 
-    function filterEvents() {
-        const dateFilter = document.getElementById('dateFilter').value;
-        if (!dateFilter) {
+            if (events.length === 0) {
+                tableBody.innerHTML = 
+                    '<tr><td colspan="4" class="px-4 py-3 text-center text-gray-500 text-sm">No events found</td></tr>';
+                return;
+            }
+
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors duration-150';
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-gray-900 truncate max-w-[200px]">${event.name}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${new Date(event.date).toLocaleDateString()}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${event.time}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 truncate max-w-[200px]">${event.location}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showLoading(show) {
+            const loadingState = document.getElementById('loadingState');
+            loadingState.className = show ? 'block' : 'hidden';
+        }
+
+        function filterEvents() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            if (!dateFilter) {
+                loadEvents();
+                return;
+            }
+            loadEvents(dateFilter);
+        }
+
+        function clearFilter() {
+            document.getElementById('dateFilter').value = '';
             loadEvents();
-            return;
         }
-        loadEvents(dateFilter);
-    }
 
-    // Add a clear filter button
-    const filterDiv = document.querySelector('.mb-4');
-    const clearButton = document.createElement('button');
-    clearButton.textContent = 'Clear Filter';
-    clearButton.className = 'bg-gray-500 text-white px-4 py-2 rounded ml-2';
-    clearButton.onclick = () => {
-        document.getElementById('dateFilter').value = '';
+        function logout() {
+            const logoutBtn = document.querySelector('button[onclick="logout()"]');
+            const originalText = logoutBtn.textContent;
+            logoutBtn.textContent = 'Logging out...';
+            logoutBtn.disabled = true;
+            window.location.href = '/logout';
+        }
+
+        // Load events when page loads
         loadEvents();
-    };
-    filterDiv.appendChild(clearButton);
-
-    // Load events when page loads
-    loadEvents()
     </script>
 </body>
 </html>

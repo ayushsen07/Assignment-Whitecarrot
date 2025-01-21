@@ -1,17 +1,50 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Google Calendar Integration</title>
+    <title>Calendar Login</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Welcome to Calendar App</h1>
-        <div class="flex justify-center">
+<body class="gradient-bg min-h-screen flex items-center justify-center">
+    <div class="glass-effect p-8 rounded-2xl card-shadow hover-scale max-w-md w-full mx-4">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+            <p class="text-gray-600">Access your calendar events seamlessly</p>
+        </div>
+
+        <div class="space-y-6">
             <a href="/auth/google" 
-               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center">
-                <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2">
-                Login with Google
+               class="flex items-center justify-center gap-3 w-full px-6 py-3 rounded-lg bg-white hover:bg- text-gray-700 border border-gray-200 transition-all duration-300 hover:shadow-lg card-shadow">
+                <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
+                <span class="text-black font-medium">Sign in with Google</span>
             </a>
+
+            <div class="text-center text-sm text-gray-500 mt-8">
+                By signing in, you agree to our
+                <a href="#" class="text-blue-500 hover:text-blue-600">Terms of Service</a>
+                and
+                <a href="#" class="text-blue-500 hover:text-blue-600">Privacy Policy</a>
+            </div>
         </div>
     </div>
 </body>
