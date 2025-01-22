@@ -13,7 +13,7 @@ https://drive.google.com/file/d/1QQ8BiI-XGFEegD4vJe7KPkeVYJ2MQQi0/view?usp=drive
 - **Authentication:** Google OAuth 2.0, Passport.js  
 - **Frontend:** HTML, Tailwind CSS, JavaScript  
 - **APIs:** Google Calendar API  
-- **Database:** Session-based storage  
+- **Database:** MongoDB 
 - **Deployment:** Render (Cloud Platform)  
 
 ## ✨ Features
