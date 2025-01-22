@@ -4,8 +4,8 @@ const session = require("express-session");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { google } = require("googleapis");
-const mongoose = require("mongoose");
-const MongoStore = require("connect-mongo");
+const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 
 const app = express();
 
@@ -16,11 +16,23 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Create User Schema and Model
 const userSchema = new mongoose.Schema({
-  googleId: String,
-  email: String,
-  name: String,
+  googleId: { 
+    type: String, 
+    required: true, 
+    unique: true
+  },
+  email: { 
+    type: String, 
+    required: true 
+  },
+  name: { 
+    type: String,
+    required: false
+  },
   accessToken: String,
   refreshToken: String
+}, { 
+  timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);
@@ -34,7 +46,7 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI,
       ttl: 24 * 60 * 60, // Session TTL (1 day)
-      autoRemove: 'native' // Enable automatic removal of expired sessions
+      autoRemove: 'native'
     }),
     cookie: {
       secure: process.env.NODE_ENV === 'production',
@@ -70,29 +82,45 @@ passport.use(
         "email",
         "https://www.googleapis.com/auth/calendar.readonly",
       ],
+      proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Find or create user
+        console.log('Profile received:', {
+          id: profile.id,
+          email: profile.emails?.[0]?.value,
+          name: profile.displayName
+        });
+
         let user = await User.findOne({ googleId: profile.id });
         
         if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            email: profile.emails[0].value,
-            name: profile.displayName,
-            accessToken,
-            refreshToken
-          });
+          try {
+            user = await User.create({
+              googleId: profile.id,
+              email: profile.emails?.[0]?.value || 'no-email',
+              name: profile.displayName || 'Anonymous',
+              accessToken,
+              refreshToken
+            });
+          } catch (createError) {
+            console.error('Error creating user:', createError);
+            return done(createError, null);
+          }
         } else {
-          // Update access token
           user.accessToken = accessToken;
           if (refreshToken) user.refreshToken = refreshToken;
-          await user.save();
+          try {
+            await user.save();
+          } catch (saveError) {
+            console.error('Error updating user:', saveError);
+            return done(saveError, null);
+          }
         }
         
         return done(null, user);
       } catch (err) {
+        console.error('Strategy error:', err);
         return done(err, null);
       }
     }
@@ -112,12 +140,20 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/auth/google", passport.authenticate("google"));
+app.get("/auth/google", (req, res, next) => {
+  console.log("Starting Google auth...");
+  passport.authenticate("google")(req, res, next);
+});
 
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => res.redirect("/events")
+app.get("/auth/google/callback", 
+  (req, res, next) => {
+    console.log("Received callback from Google");
+    passport.authenticate("google", {
+      failureRedirect: "/?error=auth_failed",
+      successRedirect: "/events",
+      failureFlash: true
+    })(req, res, next);
+  }
 );
 
 app.get("/events", isAuthenticated, async (req, res) => {
@@ -177,8 +213,11 @@ app.get("/api/events", isAuthenticated, async (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('Application error:', err);
+  if (err.name === 'TokenError') {
+    return res.redirect('/?error=auth_failed');
+  }
+  res.status(500).send('An error occurred');
 });
 
 const PORT = process.env.PORT || 2000;
