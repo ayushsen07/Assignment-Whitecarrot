@@ -42,3 +42,6 @@ services:
 
       - key: GOOGLE_API_KEY 
         value: "AIzaSyAZ2e7EVvO8m84prOlEHcHp-vzOqv6L99g"
+        
+      - key: CALLBACK_UR 
+        value: "http://localhost:7777/auth/google/callback"
