@@ -76,7 +76,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'https://myEvents.onrender.com/auth/google/callback',
+      callbackURL: 'https://myevents-svbt.onrender.com/auth/google/callback',
       scope: [
         "profile",
         "email",
