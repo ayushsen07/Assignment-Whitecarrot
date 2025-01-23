@@ -43,5 +43,3 @@ services:
       - key: GOOGLE_API_KEY 
         value: "AIzaSyAZ2e7EVvO8m84prOlEHcHp-vzOqv6L99g"
 
-      - key: CALLBACK_URL
-        value: "https://myEvents.onrender.com/auth/google/callback"
