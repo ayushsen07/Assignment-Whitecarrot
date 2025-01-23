@@ -39,3 +39,6 @@ services:
 
       - key: SESSION_SECRET 
         value: "myverysecretkey123"
+
+      - key: GOOGLE_API_KEY 
+        value: "AIzaSyAZ2e7EVvO8m84prOlEHcHp-vzOqv6L99g"
