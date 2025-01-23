@@ -2,11 +2,10 @@
 
 A web application that implements Google Single Sign-On (SSO) and displays user's Google Calendar events in a filterable table format.
 
-## 🖼️ Screenshots
+## 🖼️ Demo Video
 
 <!-- Add your application screenshots here -->
-![Login Page](path_to_your_login_page_screenshot.png)  
-![Events Page](path_to_your_events_page_screenshot.png)
+https://drive.google.com/file/d/1QQ8BiI-XGFEegD4vJe7KPkeVYJ2MQQi0/view?usp=drivesdk
 
 ## 🛠️ Tech Stack
 
@@ -14,7 +13,7 @@ A web application that implements Google Single Sign-On (SSO) and displays user'
 - **Authentication:** Google OAuth 2.0, Passport.js  
 - **Frontend:** HTML, Tailwind CSS, JavaScript  
 - **APIs:** Google Calendar API  
-- **Database:** Session-based storage  
+- **Database:** MongoDB 
 - **Deployment:** Render (Cloud Platform)  
 
 ## ✨ Features
@@ -26,9 +25,6 @@ A web application that implements Google Single Sign-On (SSO) and displays user'
 - Responsive Table Design  
 - Session Management  
 
-## 🚀 Live Demo
-
-Visit the live application: [Your Deployed App URL]  
 
 ## 📋 Prerequisites
 
