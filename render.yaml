@@ -1,0 +1,41 @@
+
+services:
+  - type: web
+
+    name: my-events
+
+    env: node
+
+    plan: free
+
+    buildCommand: npm install
+
+    startCommand: npm start
+
+    branch: main # Adjust if your default branch is different
+
+    region: singapore # Change to your preferred Render region
+
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+
+        value: production
+
+      - key: MONGO
+
+        value: "mongodb+srv://ayush07:Ayush777@cluster0.lihv6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+      - key: PORT
+
+        value: 7777 # Ensure this matches the port your app listens on
+
+      - key: GOOGLE_CLIENT_ID 
+        value: "866432884867-t2rpadt28kkm85voclbd5nnqrgbta21p.apps.googleusercontent.com"
+
+      - key: GOOGLE_CLIENT_SECRET 
+        value: "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"
+
+      - key: SESSION_SECRET 
+        value: "myverysecretkey123"
